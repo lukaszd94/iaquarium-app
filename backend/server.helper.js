@@ -13,12 +13,12 @@ const io = require('socket.io')(server, {
     }
 });
 
-let port = 8081;
+let port = (process.env.PORT || 8080);
 
 function configureExpress(serverMode, serverPort) {
     switch (serverMode) {
         case 'prod':
-            app.use(express.static(__dirname.replace('backend', '') + '/new-frontend/dist'));
+            app.use(express.static(__dirname.replace('backend', '') + '/dist'));
             console.log('### SERVER:\t\t Running on port ' + port + ' and PUBLIC mode...');
             console.log('### SERVER:\t\t Serving /dist...');
             break;
@@ -28,9 +28,9 @@ function configureExpress(serverMode, serverPort) {
             console.log('### SERVER:\t\t Serving /frontend...');
             break;
         default:
-            app.use(express.static(__dirname.replace('backend', '') + '/frontend'));
+            app.use(express.static(__dirname.replace('backend', '') + '/dist'));
             console.log('### SERVER:\t\t Running on port ' + port + ' and DEVELOPMENT mode...');
-            console.log('### SERVER:\t\t Serving /frontend...');
+            console.log('### SERVER:\t\t Serving /dist...');
             break;
     }
 
