@@ -150,6 +150,17 @@ let mainRoutes = function (router, io) {
             }, (error) => {
                 rest.Error(res, 'ERROR', [error], 401);
             });
+        });
+        
+        
+    router
+        .route('/register-token')
+        .post(function (req, res) {
+            mainRepository.registerFirebaseToken(req.body.token, req.body.userAgent).then((response) => {
+                rest.Ok(res, response, 200);
+            }, (error) => {
+                rest.Error(res, 'ERROR', [error], 401);
+            });
         })
 
 };

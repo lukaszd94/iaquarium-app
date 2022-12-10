@@ -5,6 +5,7 @@ const configData = require('../../config');
 const Temperature = require('../../database/models/temperature.schema.js');
 const State = require('../../database/models/state.schema.js');
 const Config = require('../../database/models/config.schema');
+const FirebaseToken = require('../../database/models/firebaseToken.schema');
 
 const messaging = require('firebase/messaging');
 const firebase = require('firebase/app');
@@ -161,8 +162,8 @@ let mainRepository = function (io) {
         });
     };
 
-    let sendFirebaseMessage = function () {
-        const registrationToken = 'c17wD4T_z6PKHKQTqRJPon:APA91bEGV_u4o2Iaa2L7pvxYAPUhE97EuAZEi2xib7vIxycYWY5w0NBkRrekbSo0b6m8QCMNC4IDv2WcYZHalNuJYC1XmASjA4VlNqo33IP1l7c7S0h3MsaoztDmjtN8700djKCTHFWl';
+    let sendFirebaseMessage = function (token) {
+        const registrationToken = token;
 
         const message = {
             data: {
@@ -192,6 +193,22 @@ let mainRepository = function (io) {
             .catch((error) => {
                 console.log('Error sending message:', error);
             });
+    };    
+    
+    let registerFirebaseToken = function (token, userAgent) {
+        return new Promise(function (resolve, reject) {
+            const frebaseToken = {
+                registerDate: new Date(),
+                token: token,
+                userAgent: userAgent
+            }
+
+            FirebaseToken.create(frebaseToken).then((data) => {
+                resolve(updatedConfig);
+            }).catch((err) => {
+                reject(err);
+            });
+        });
     };
 
 
@@ -207,14 +224,15 @@ let mainRepository = function (io) {
         getConfigData: getConfigData,
         setConfigData: setConfigData,
         checkPassword: checkPassword,
-        sendFirebaseMessage: sendFirebaseMessage
+        sendFirebaseMessage: sendFirebaseMessage,
+        registerFirebaseToken: registerFirebaseToken
     };
 };
 
 module.exports = mainRepository;
 
 function getToken() {
-    return jwt.sign({ login: 'lukasor' }, configData.serverSecret, { expiresIn: '1000h' });
+    return jwt.sign({ login: 'lukasor' }, configData.serverSecret, { expiresIn: '100h' });
 }
 
 function getPassword() {

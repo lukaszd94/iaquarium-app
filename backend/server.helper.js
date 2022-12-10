@@ -7,14 +7,18 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const server = require('http').createServer(app);
-const io = require('socket.io')(server);
+const io = require('socket.io')(server, {
+    cors: {
+        origin: "http://localhost:8080"
+    }
+});
 
-let port = (process.env.PORT || 8080);
+let port = 8081;
 
 function configureExpress(serverMode, serverPort) {
     switch (serverMode) {
         case 'prod':
-            app.use(express.static(__dirname.replace('backend', '') + '/dist'));
+            app.use(express.static(__dirname.replace('backend', '') + '/new-frontend/dist'));
             console.log('### SERVER:\t\t Running on port ' + port + ' and PUBLIC mode...');
             console.log('### SERVER:\t\t Serving /dist...');
             break;
@@ -24,9 +28,9 @@ function configureExpress(serverMode, serverPort) {
             console.log('### SERVER:\t\t Serving /frontend...');
             break;
         default:
-            app.use(express.static(__dirname.replace('backend', '') + '/dist'));
+            app.use(express.static(__dirname.replace('backend', '') + '/frontend'));
             console.log('### SERVER:\t\t Running on port ' + port + ' and DEVELOPMENT mode...');
-            console.log('### SERVER:\t\t Serving /dist...');
+            console.log('### SERVER:\t\t Serving /frontend...');
             break;
     }
 
