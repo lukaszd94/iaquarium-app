@@ -162,49 +162,59 @@ let mainRepository = function (io) {
         });
     };
 
-    let sendFirebaseMessage = function (token) {
-        const registrationToken = token;
+    let sendFirebaseMessage = function () {
+        return new Promise(function (resolve, reject) {
 
-        const message = {
-            data: {
-                score: '850',
-                time: '2:45'
-            },
-            token: registrationToken
-        };
+            let firebaseConfig = {
+                apiKey: "AIzaSyA9g3qOYvcfyZ1UU-HDvDl-96HIli3rucE",
+                authDomain: "iaquarium-v2-aaae7.firebaseapp.com",
+                projectId: "iaquarium-v2-aaae7",
+                storageBucket: "iaquarium-v2-aaae7.appspot.com",
+                messagingSenderId: "1093225067884",
+                appId: "1:1093225067884:web:b1a5640779cfb95eadef49",
+                measurementId: "G-ERVX777CB5"
+            };
 
-        let firebaseConfig = {
-            apiKey: "AIzaSyA9g3qOYvcfyZ1UU-HDvDl-96HIli3rucE",
-            authDomain: "iaquarium-v2-aaae7.firebaseapp.com",
-            projectId: "iaquarium-v2-aaae7",
-            storageBucket: "iaquarium-v2-aaae7.appspot.com",
-            messagingSenderId: "1093225067884",
-            appId: "1:1093225067884:web:b1a5640779cfb95eadef49",
-            measurementId: "G-ERVX777CB5"
-        };
+            const app = firebase.initializeApp(firebaseConfig);
 
-        const app = firebase.initializeApp(firebaseConfig);
 
-        messaging.getMessaging().send(message)
-            .then((response) => {
-                // Response is a message ID string.
-                console.log('Successfully sent message:', response);
-            })
-            .catch((error) => {
-                console.log('Error sending message:', error);
+            FirebaseToken.find({}).then((firebaseTokens) => {
+                const message = {
+                    data: {
+                        score: '850',
+                        time: '2:45'
+                    },
+                    token: firebaseTokens[0]
+                };
+
+                messaging.getMessaging().sendMulticast(message)
+                    .then((response) => {
+                        // Response is a message ID string.
+                        console.log('Successfully sent message:', response);
+
+                        resolve({});
+                    })
+                    .catch((error) => {
+                        console.log('Error sending message:', error);
+                        reject(err);
+                    });
+
+            }).catch((err) => {
+
             });
-    };    
-    
+        });
+    };
+
     let registerFirebaseToken = function (token, userAgent) {
         return new Promise(function (resolve, reject) {
-            const frebaseToken = {
+            const firebaseToken = {
                 registerDate: new Date(),
                 token: token,
                 userAgent: userAgent
             }
 
-            FirebaseToken.create(frebaseToken).then((data) => {
-                resolve(updatedConfig);
+            FirebaseToken.findOneAndUpdate({ token: firebaseToken.token }, firebaseToken, { new: true }).then((savedData) => {
+                resolve(savedData);
             }).catch((err) => {
                 reject(err);
             });
