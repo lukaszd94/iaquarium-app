@@ -7,8 +7,12 @@ const State = require('../../database/models/state.schema.js');
 const Config = require('../../database/models/config.schema');
 const FirebaseToken = require('../../database/models/firebaseToken.schema');
 
-const messaging = require('firebase/messaging');
-const firebase = require('firebase/app');
+const firebaseAdmin = require('firebase-admin');
+let serviceAccount = "iaquarium-v2-aaae7-firebase-adminsdk-k7bp2-262b6259b8.json";
+const firebaseAdm = firebaseAdmin.initializeApp({
+    credential: firebaseAdmin.credential.cert(serviceAccount)
+});
+
 
 //const raspberryService = require('../../raspberryService.js');
 let mainRepository = function (io) {
@@ -164,44 +168,51 @@ let mainRepository = function (io) {
 
     let sendFirebaseMessage = function () {
         return new Promise(function (resolve, reject) {
+            try {
+                // let firebaseConfig = {
+                //     apiKey: "AIzaSyA9g3qOYvcfyZ1UU-HDvDl-96HIli3rucE",
+                //     authDomain: "iaquarium-v2-aaae7.firebaseapp.com",
+                //     projectId: "iaquarium-v2-aaae7",
+                //     storageBucket: "iaquarium-v2-aaae7.appspot.com",
+                //     messagingSenderId: "1093225067884",
+                //     appId: "1:1093225067884:web:b1a5640779cfb95eadef49",
+                //     measurementId: "G-ERVX777CB5"
+                // };
 
-            let firebaseConfig = {
-                apiKey: "AIzaSyA9g3qOYvcfyZ1UU-HDvDl-96HIli3rucE",
-                authDomain: "iaquarium-v2-aaae7.firebaseapp.com",
-                projectId: "iaquarium-v2-aaae7",
-                storageBucket: "iaquarium-v2-aaae7.appspot.com",
-                messagingSenderId: "1093225067884",
-                appId: "1:1093225067884:web:b1a5640779cfb95eadef49",
-                measurementId: "G-ERVX777CB5"
-            };
+                // let serviceAccount = "iaquarium-v2-aaae7-firebase-adminsdk-k7bp2-262b6259b8.json";
+                // const firebaseAdm = firebaseAdmin.initializeApp({
+                //     credential: firebaseAdmin.credential.cert(serviceAccount)
+                // });
 
-            const app = firebase.initializeApp(firebaseConfig);
+                FirebaseToken.find({}).then((firebaseTokens) => {
+                    const message = {
+                        data: {
+                            score: '850',
+                            time: '2:45'
+                        },
+                        tokens: firebaseTokens.map(item => item.token)
+                    };
 
+                    firebaseAdm.messaging().sendMulticast(message)
+                        .then((response) => {
+                            // Response is a message ID string.
+                            console.log('Successfully sent message:', response);
+                            resolve({});
+                        })
+                        .catch((error) => {
+                            console.log('Error sending message:', error);
+                            reject(error);
+                        });
 
-            FirebaseToken.find({}).then((firebaseTokens) => {
-                const message = {
-                    data: {
-                        score: '850',
-                        time: '2:45'
-                    },
-                    token: firebaseTokens[0]
-                };
-
-                messaging.getMessaging().sendMulticast(message)
-                    .then((response) => {
-                        // Response is a message ID string.
-                        console.log('Successfully sent message:', response);
-
-                        resolve({});
-                    })
-                    .catch((error) => {
-                        console.log('Error sending message:', error);
-                        reject(err);
-                    });
-
-            }).catch((err) => {
-
-            });
+                }).catch((err) => {
+                    console.log('Error messaging:', err);
+                    reject(err);
+                });
+            }
+            catch (error) {
+                console.log('Error:', error);
+                reject(error);
+            }
         });
     };
 
