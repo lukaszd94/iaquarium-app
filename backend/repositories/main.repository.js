@@ -187,8 +187,17 @@ let mainRepository = function (io) {
                 FirebaseToken.find({}).then((firebaseTokens) => {
                     const message = {
                         data: {
-                            score: '850',
-                            time: '2:45'
+                            iaquarium: 123,
+                            backendMessage: 'hello from iaquarium backend'
+                        },
+                        notification: {
+                            title: "iaquarium Message Title",
+                            body: "iaquarium message body"
+                        },
+                        webpush: {
+                            fcm_options: {
+                                link: "https://iaquarium.ml"
+                            }
                         },
                         tokens: firebaseTokens.map(item => item.token)
                     };
