@@ -192,11 +192,40 @@ let mainRepository = function (io) {
                         },
                         notification: {
                             title: "iaquarium Message Title",
-                            body: "iaquarium message body"
+                            body: "iaquarium message body",
+                            imageUrl: "https://iaquarium.ml/logo.png"
                         },
                         webpush: {
-                            fcm_options: {
+                            fcmOptions: {
                                 link: "https://iaquarium.ml"
+                            },
+                            data: {
+                                iaquarium: "123",
+                                backendMessage: "hello from iaquarium backend"
+                            },
+                            notification: {
+                                title: "iaquarium Message Title",
+                                body: "iaquarium message body",
+                                renotify: true,
+                                requireInteraction: true,
+                                tag: "1234",
+                                image: "https://iaquarium.ml/logo.png"
+                            },
+                        },
+                        android: {
+                            priority: "high",
+                            collapseKey: "1234",
+                            data: {
+                                iaquarium: "123",
+                                backendMessage: 'hello from iaquarium backend'
+                            },
+                            notification: {
+                                title: "iaquarium Message Title",
+                                body: "iaquarium message body",
+                                imageUrl: "https://iaquarium.ml/logo.png",
+                                color: "#42b983",
+                                priority: "high",
+                                tag: "1234",
                             }
                         },
                         tokens: firebaseTokens.map(item => item.token)
