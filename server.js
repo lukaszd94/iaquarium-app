@@ -17,7 +17,7 @@ mongoose.Promise = global.Promise;
 serverHelper.app.use(cors());
 serverHelper.app.use('/scripts', serverHelper.express.static(__dirname + '/node_modules/'));
 mongoose
-    .connect(config.dbUrl, { useNewUrlParser: true, useUnifiedTopology: true }, (err, db) => {
+    .connect(config.dbUrl, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }, (err, db) => {
         if (err) {
             console.error('### DATABASE:\t Unable to connect to server... \n### Error:', err.message);
         } else {

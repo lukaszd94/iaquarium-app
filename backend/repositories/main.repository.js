@@ -187,7 +187,7 @@ let mainRepository = function (io) {
                 FirebaseToken.find({}).then((firebaseTokens) => {
                     const message = {
                         data: {
-                            iaquarium: 123,
+                            iaquarium: "123",
                             backendMessage: 'hello from iaquarium backend'
                         },
                         notification: {
@@ -233,11 +233,17 @@ let mainRepository = function (io) {
                 userAgent: userAgent
             }
 
-            FirebaseToken.findOneAndUpdate({ token: firebaseToken.token }, firebaseToken, { new: true }).then((savedData) => {
-                resolve(savedData);
-            }).catch((err) => {
-                reject(err);
-            });
+            FirebaseToken.findOneAndUpdate(
+                { token: firebaseToken.token },
+                firebaseToken,
+                { upsert: true, new: true, setDefaultsOnInsert: true },
+                (err, savedData) => {
+                    if (err) {
+                        reject(err);
+                    }
+
+                    resolve(savedData);
+                });
         });
     };
 
